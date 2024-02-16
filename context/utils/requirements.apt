@@ -1,0 +1,16 @@
+apt-utils
+sudo
+ufw
+wget
+curl
+bzip2
+ca-certificates
+software-properties-common
+ubuntu-drivers-common
+build-essential
+openssh-server
+vim
+git
+unzip
+htop
+net-tools

@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  compute:
+    image: alchemine/base-cde:ubuntu22.04
+    ports:
+      - 10022:22
+      - 3306:3306
+      - 5000:5000
+      - 5006:5006
+      - 6000:6000
+      - 6006:6006
+      - 7860:7860
+      - 8000:8000
+      - 8080:8080
+      - 8384:8384
+      - 8501:8501
+      - 8786:8786
+      - 8787:8787
+      - 8888:8888
+      - 8889:8889
+    volumes:
+      - .:/opt/project
+    hostname: "dev"
+    restart: always
+    tty: true
+    ipc: host
+    privileged: true
