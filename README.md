@@ -37,3 +37,30 @@
 # 4. Dockerfile
 
 - [Dockerfile](https://github.com/alchemine/base-cde/blob/main/Dockerfile)
+
+# 5. Dev container
+
+1. 환경변수(`BASE_CDE_PATH`, `HOME`) 등록
+
+   ```json
+   "build": {
+      // Sets the run context to one level up instead of the .devcontainer folder.
+      "context": "${localEnv:BASE_CDE_PATH}",
+      // Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+      "dockerfile": "${localEnv:BASE_CDE_PATH}/Dockerfile"
+   },
+   "mounts": ["source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind"]
+   ```
+
+2. `.devcontainer` 복사
+   ```bash
+   cp -r ${BASE_CDE_PATH}/.devcontainer /path/to/target/folder
+   ```
+3. (optional) `requirements.txt` 설치
+
+   ```json
+   // .devcontainer.json
+
+   ...
+   "postCreateCommand": "pip install -r requirements.txt"
+   ```
