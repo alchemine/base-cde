@@ -1,2 +1,1 @@
-# base-cde
-Base Container Development Environment
+# Base Container Development Environment
