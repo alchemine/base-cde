@@ -4,6 +4,9 @@ LABEL maintainer="alchemine <djyoon0223@gmail.com>"
 
 # ignore interaction
 ARG DEBIAN_FRONTEND=noninteractive
+ARG INSTALL_PYTHON=true
+ARG INSTALL_POETRY=true
+ARG INSTALL_JAVA=true
 
 # copy context
 COPY context/config     /opt/docker/context/config
@@ -27,13 +30,19 @@ RUN cat /opt/docker/context/config/account | chpasswd && \
     ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 # install python
-RUN /opt/docker/context/utils/install_python.sh
+RUN if [ "$INSTALL_PYTHON" = "true" ]; then \
+        /opt/docker/context/utils/install_python.sh; \
+    fi
 
 # install poetry
-RUN /opt/docker/context/utils/install_poetry.sh
+RUN if [ "$INSTALL_POETRY" = "true" ]; then \
+        /opt/docker/context/utils/install_poetry.sh; \
+    fi
 
 # install java
-RUN /opt/docker/context/utils/install_java.sh
+RUN if [ "$INSTALL_JAVA" = "true" ]; then \
+        /opt/docker/context/utils/install_java.sh; \
+    fi  
 
 # install extension packages
 COPY context/extension /opt/docker/context/extension
