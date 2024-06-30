@@ -1,55 +1,15 @@
-# syntax=docker/dockerfile:1
-FROM ubuntu:jammy-20240212
-LABEL maintainer="alchemine <djyoon0223@gmail.com>"
+# Use the Python base image
+ARG VARIANT="3.11-bullseye"
+FROM mcr.microsoft.com/devcontainers/python:${VARIANT}
 
-# ignore interaction
-ARG DEBIAN_FRONTEND=noninteractive
-ARG INSTALL_PYTHON=true
-ARG INSTALL_POETRY=true
-ARG INSTALL_JAVA=true
+# Define the version of Poetry to install
+ARG POETRY_VERSION=1.8.3
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_NO_INTERACTION=true
 
-# copy context
-COPY context/config     /opt/docker/context/config
-COPY context/entrypoint /opt/docker/context/entrypoint
-COPY context/utils      /opt/docker/context/utils
+# Create a Python virtual environment for Poetry and install it
+RUN pipx install poetry==${POETRY_VERSION}
 
-# use proxy
-RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#http://mirror.kakao.com/ubuntu/#g' /etc/apt/sources.list && \
-    sed -i 's#http://security.ubuntu.com/ubuntu/#http://mirror.kakao.com/ubuntu/#g' /etc/apt/sources.list
-
-# install fundamental packages
-RUN apt update && \
-    xargs apt install -y < /opt/docker/context/utils/requirements.apt && \
-    rm -rf /var/lib/apt/lists/*
-
-# set fundamental configuration
-RUN cat /opt/docker/context/config/account | chpasswd && \
-    cat /opt/docker/context/config/sshd_config >> /etc/ssh/sshd_config && \
-    cat /opt/docker/context/config/bashrc >> /root/.bashrc && \
-    cat /opt/docker/context/config/vimrc >> /usr/share/vim/vimrc && \
-    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
-
-# install python
-RUN if [ "$INSTALL_PYTHON" = "true" ]; then \
-        /opt/docker/context/utils/install_python.sh; \
-    fi
-
-# install poetry
-RUN if [ "$INSTALL_POETRY" = "true" ]; then \
-        /opt/docker/context/utils/install_poetry.sh; \
-    fi
-
-# install java
-RUN if [ "$INSTALL_JAVA" = "true" ]; then \
-        /opt/docker/context/utils/install_java.sh; \
-    fi  
-
-# install extension packages
-COPY context/extension /opt/docker/context/extension
-RUN apt update && \
-    xargs apt install -y < /opt/docker/context/extension/requirements.apt && \
-    rm -rf /var/lib/apt/lists/*
-
-# run entrypoint.sh
-ENTRYPOINT [ "/opt/docker/context/entrypoint/entrypoint.sh" ]
-CMD [ "/bin/bash" ]
+# Setup for bash
+RUN poetry completions bash >> /home/vscode/.bash_completion && \
+    echo "export PATH=.:$PATH" >> ~/.bashrc
